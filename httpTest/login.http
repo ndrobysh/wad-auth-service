@@ -1,0 +1,8 @@
+### Login
+POST http://localhost:8081/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "player1",
+  "password": "password123"
+}
