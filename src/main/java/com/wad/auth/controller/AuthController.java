@@ -5,6 +5,10 @@ import com.wad.auth.dto.LoginResponse;
 import com.wad.auth.dto.ValidateRequest;
 import com.wad.auth.dto.ValidateResponse;
 import com.wad.auth.service.AuthService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
+@Tag(name = "Authentification", description = "Endpoints de gestion des tokens")
 public class AuthController {
 
     private final AuthService authService;
@@ -26,10 +31,12 @@ public class AuthController {
     /**
      * POST /api/auth/login
      * Authentifie un utilisateur et retourne un token.
-     *
-     * @param request les identifiants de connexion (username, password)
-     * @return 200 avec le token si succès, 401 si échec
      */
+    @Operation(summary = "Connexion", description = "Authentifie un utilisateur et retourne un token valide 1 heure")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Connexion réussie, token retourné"),
+            @ApiResponse(responseCode = "401", description = "Identifiants invalides")
+    })
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
         log.info("POST /api/auth/login - utilisateur: {}", request.getUsername());
@@ -40,11 +47,12 @@ public class AuthController {
     /**
      * POST /api/auth/validate
      * Valide un token et retourne le nom d'utilisateur associé.
-     * Renouvelle automatiquement la date d'expiration si valide.
-     *
-     * @param request le token à valider
-     * @return 200 avec username si valide, 401 si invalide/expiré
      */
+    @Operation(summary = "Validation", description = "Valide un token et renouvelle son expiration si valide")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Token valide, username retourné"),
+            @ApiResponse(responseCode = "401", description = "Token invalide ou expiré")
+    })
     @PostMapping("/validate")
     public ResponseEntity<ValidateResponse> validate(@Valid @RequestBody ValidateRequest request) {
         log.debug("POST /api/auth/validate");
@@ -59,10 +67,11 @@ public class AuthController {
     /**
      * POST /api/auth/logout
      * Déconnecte un utilisateur en invalidant son token.
-     *
-     * @param request le token à invalider
-     * @return 200 si succès
      */
+    @Operation(summary = "Déconnexion", description = "Invalide le token de l'utilisateur")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Déconnexion réussie")
+    })
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(@Valid @RequestBody ValidateRequest request) {
         log.info("POST /api/auth/logout");
