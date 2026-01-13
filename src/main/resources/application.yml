@@ -14,3 +14,5 @@ spring:
 auth:
   token:
     expiration-hours: 1
+    # Clé secrète AES (16 caractères minimum)
+    secret-key: ${TOKEN_SECRET_KEY:WadGachaSecret16}

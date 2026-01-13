@@ -1,5 +1,6 @@
 package com.wad.auth.service;
 
+import com.wad.auth.config.TokenEncryptionConfig;
 import com.wad.auth.dto.LoginRequest;
 import com.wad.auth.dto.LoginResponse;
 import com.wad.auth.dto.ValidateResponse;
@@ -11,10 +12,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Base64;
 import java.util.Optional;
 
 /**
@@ -28,6 +27,7 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final TokenRepository tokenRepository;
+    private final TokenEncryptionConfig encryptionConfig;
 
     /**
      * Durée de validité du token en heures
@@ -134,10 +134,10 @@ public class AuthService {
     }
 
     /**
-     * Génère un token au format : username-YYYY/MM/DD-HH:mm:ss (encodé en Base64)
+     * Génère un token au format : username-YYYY/MM/DD-HH:mm:ss (chiffré avec AES)
      *
      * @param username le nom d'utilisateur
-     * @return le token encodé
+     * @return le token chiffré
      */
     private String generateToken(String username) {
         LocalDateTime now = LocalDateTime.now();
@@ -146,8 +146,18 @@ public class AuthService {
                 now.format(DATE_FORMATTER),
                 now.format(TIME_FORMATTER));
 
-        // Encodage en Base64 pour "chiffrement" simple
-        return Base64.getEncoder().encodeToString(rawToken.getBytes(StandardCharsets.UTF_8));
+        // Chiffrement AES du token
+        return encryptionConfig.encrypt(rawToken);
+    }
+
+    /**
+     * Déchiffre un token pour extraire les informations
+     *
+     * @param encryptedToken le token chiffré
+     * @return le contenu déchiffré (username-date-heure)
+     */
+    public String decryptToken(String encryptedToken) {
+        return encryptionConfig.decrypt(encryptedToken);
     }
 
     /**
