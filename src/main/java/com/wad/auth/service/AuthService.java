@@ -10,16 +10,13 @@ import com.wad.auth.repository.TokenRepository;
 import com.wad.auth.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
-/**
- * Service d'authentification.
- * Gère la connexion, la validation et la génération des tokens.
- */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -28,50 +25,29 @@ public class AuthService {
     private final UserRepository userRepository;
     private final TokenRepository tokenRepository;
     private final TokenEncryptionConfig encryptionConfig;
+    private final PasswordEncoder passwordEncoder;
 
-    /**
-     * Durée de validité du token en heures
-     */
     private static final int TOKEN_VALIDITY_HOURS = 1;
-
-    /**
-     * Format de la date dans le token : YYYY/MM/DD
-     */
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy/MM/dd");
-
-    /**
-     * Format de l'heure dans le token : HH:mm:ss
-     */
     private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss");
 
-    /**
-     * Authentifie un utilisateur et génère un token.
-     * Format du token : username-date(YYYY/MM/DD)-heure(HH:mm:ss) (encodé en Base64)
-     *
-     * @param request les identifiants de connexion
-     * @return le token généré si authentification réussie
-     * @throws AuthenticationException si les identifiants sont invalides
-     */
     public LoginResponse login(LoginRequest request) {
         log.info("Tentative de connexion pour l'utilisateur: {}", request.getUsername());
 
-        // Recherche de l'utilisateur
         User user = userRepository.findByUsername(request.getUsername())
                 .orElseThrow(() -> {
                     log.warn("Utilisateur non trouvé: {}", request.getUsername());
                     return new AuthenticationException("Identifiants invalides");
                 });
 
-        // Vérification du mot de passe (comparaison simple pour l'instant)
-        if (!user.getPassword().equals(request.getPassword())) {
+        // Vérification du mot de passe avec BCrypt
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             log.warn("Mot de passe incorrect pour l'utilisateur: {}", request.getUsername());
             throw new AuthenticationException("Identifiants invalides");
         }
 
-        // Suppression des anciens tokens de l'utilisateur
         tokenRepository.deleteByUsername(user.getUsername());
 
-        // Génération du nouveau token
         String tokenValue = generateToken(user.getUsername());
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime expiresAt = now.plusHours(TOKEN_VALIDITY_HOURS);
