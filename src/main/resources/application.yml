@@ -11,6 +11,9 @@ spring:
       database: auth_db
 
 # Configuration du token
+cors:
+  allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000,http://frontend-service:3000}
+
 auth:
   token:
     expiration-hours: 1
