@@ -13,18 +13,10 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Gestionnaire global des exceptions pour l'API d'authentification.
- * Convertit les exceptions en réponses HTTP appropriées.
- */
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    /**
-     * Gère les erreurs d'authentification (identifiants invalides).
-     * Retourne un code 401 Unauthorized.
-     */
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<ErrorResponse> handleAuthenticationException(AuthenticationException ex) {
         log.warn("Erreur d'authentification: {}", ex.getMessage());
@@ -36,10 +28,6 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
     }
 
-    /**
-     * Gère les erreurs de validation des requêtes.
-     * Retourne un code 400 Bad Request avec les détails des erreurs.
-     */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidationExceptions(MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();
@@ -59,10 +47,6 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(error);
     }
 
-    /**
-     * Gère toutes les autres exceptions non gérées.
-     * Retourne un code 500 Internal Server Error.
-     */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGenericException(Exception ex) {
         log.error("Erreur inattendue: ", ex);
@@ -74,9 +58,6 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
     }
 
-    /**
-     * Structure de réponse pour les erreurs
-     */
     public record ErrorResponse(
             int status,
             String message,

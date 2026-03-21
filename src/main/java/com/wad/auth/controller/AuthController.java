@@ -24,10 +24,6 @@ public class AuthController {
 
     private final AuthService authService;
 
-    /**
-     * POST /api/auth/login
-     * Authentifie un utilisateur et retourne un token.
-     */
     @Operation(summary = "Connexion", description = "Authentifie un utilisateur et retourne un token valide 1 heure")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Connexion réussie, token retourné"),

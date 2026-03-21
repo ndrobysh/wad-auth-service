@@ -32,6 +32,7 @@ public class AuthService {
     private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss");
 
     public LoginResponse login(LoginRequest request) {
+        System.out.println("=== login attempt: " + request.getUsername());
         log.info("Tentative de connexion pour l'utilisateur: {}", request.getUsername());
 
         User user = userRepository.findByUsername(request.getUsername())
@@ -64,13 +65,6 @@ public class AuthService {
         return new LoginResponse(tokenValue);
     }
 
-    /**
-     * Valide un token et retourne le nom d'utilisateur associé.
-     * Renouvelle automatiquement la date d'expiration si le token est valide.
-     *
-     * @param tokenValue le token à valider
-     * @return les informations de validation
-     */
     public ValidateResponse validate(String tokenValue) {
         log.debug("Validation du token");
 
@@ -98,23 +92,12 @@ public class AuthService {
         return ValidateResponse.valid(token.getUsername());
     }
 
-    /**
-     * Déconnecte un utilisateur en supprimant son token.
-     *
-     * @param tokenValue le token à invalider
-     */
     public void logout(String tokenValue) {
         log.info("Déconnexion demandée");
         tokenRepository.deleteByToken(tokenValue);
         log.info("Déconnexion effectuée");
     }
 
-    /**
-     * Génère un token au format : username-YYYY/MM/DD-HH:mm:ss (chiffré avec AES)
-     *
-     * @param username le nom d'utilisateur
-     * @return le token chiffré
-     */
     private String generateToken(String username) {
         LocalDateTime now = LocalDateTime.now();
         String rawToken = String.format("%s-%s-%s",
@@ -126,19 +109,10 @@ public class AuthService {
         return encryptionConfig.encrypt(rawToken);
     }
 
-    /**
-     * Déchiffre un token pour extraire les informations
-     *
-     * @param encryptedToken le token chiffré
-     * @return le contenu déchiffré (username-date-heure)
-     */
     public String decryptToken(String encryptedToken) {
         return encryptionConfig.decrypt(encryptedToken);
     }
 
-    /**
-     * Exception personnalisée pour les erreurs d'authentification
-     */
     public static class AuthenticationException extends RuntimeException {
         public AuthenticationException(String message) {
             super(message);

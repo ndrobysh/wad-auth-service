@@ -8,26 +8,15 @@ import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
-/**
- * Configuration et utilitaires pour le chiffrement des tokens.
- * Utilise AES pour chiffrer le format : username-YYYY/MM/DD-HH:mm:ss
- */
+// TODO peut-etre passer a un vrai JWT plus tard ?
 @Configuration
 public class TokenEncryptionConfig {
 
-    /**
-     * Clé secrète pour le chiffrement AES (16 caractères = 128 bits)
-     */
     @Value("${auth.token.secret-key:WadGachaSecret16}")
     private String secretKey;
 
     private static final String ALGORITHM = "AES";
 
-    /**
-     * Chiffre une chaîne avec AES
-     * @param data la chaîne à chiffrer
-     * @return la chaîne chiffrée en Base64
-     */
     public String encrypt(String data) {
         try {
             SecretKeySpec keySpec = new SecretKeySpec(
@@ -43,11 +32,6 @@ public class TokenEncryptionConfig {
         }
     }
 
-    /**
-     * Déchiffre une chaîne chiffrée avec AES
-     * @param encryptedData la chaîne chiffrée en Base64
-     * @return la chaîne déchiffrée
-     */
     public String decrypt(String encryptedData) {
         try {
             SecretKeySpec keySpec = new SecretKeySpec(
@@ -64,9 +48,6 @@ public class TokenEncryptionConfig {
         }
     }
 
-    /**
-     * Assure que la clé fait exactement 16 caractères (128 bits)
-     */
     private String padKey(String key) {
         if (key.length() >= 16) {
             return key.substring(0, 16);
