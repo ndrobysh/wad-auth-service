@@ -13,9 +13,6 @@ public class LoginRequest {
     @NotBlank(message = "Le nom d'utilisateur est obligatoire")
     private String username;
 
-    /**
-     * Mot de passe
-     */
     @NotBlank(message = "Le mot de passe est obligatoire")
     private String password;
 }
