@@ -15,10 +15,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-/**
- * Contrôleur REST pour l'authentification.
- * Expose les endpoints de connexion, validation et déconnexion.
- */
 @Slf4j
 @RestController
 @RequestMapping("/api/auth")
@@ -44,10 +40,6 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
-    /**
-     * POST /api/auth/validate
-     * Valide un token et retourne le nom d'utilisateur associé.
-     */
     @Operation(summary = "Validation", description = "Valide un token et renouvelle son expiration si valide")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Token valide, username retourné"),
@@ -64,10 +56,6 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
-    /**
-     * POST /api/auth/logout
-     * Déconnecte un utilisateur en invalidant son token.
-     */
     @Operation(summary = "Déconnexion", description = "Invalide le token de l'utilisateur")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Déconnexion réussie")
