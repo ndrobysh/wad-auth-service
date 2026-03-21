@@ -5,18 +5,11 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * DTO pour la requête de connexion.
- * Contient les identifiants de l'utilisateur.
- */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class LoginRequest {
 
-    /**
-     * Nom d'utilisateur
-     */
     @NotBlank(message = "Le nom d'utilisateur est obligatoire")
     private String username;
 
