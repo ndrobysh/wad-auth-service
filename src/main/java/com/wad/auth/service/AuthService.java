@@ -105,6 +105,7 @@ public class AuthService {
                 now.format(DATE_FORMATTER),
                 now.format(TIME_FORMATTER));
 
+        // ancienne version: UUID.randomUUID().toString()
         // Chiffrement AES du token
         return encryptionConfig.encrypt(rawToken);
     }
